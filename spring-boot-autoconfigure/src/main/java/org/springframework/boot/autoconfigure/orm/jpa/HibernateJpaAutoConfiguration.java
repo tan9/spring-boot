@@ -159,6 +159,18 @@ public class HibernateJpaAutoConfiguration extends JpaBaseConfiguration {
 				logger.debug("Unable to set Hibernate JTA platform : " + ex.getMessage());
 			}
 		}
+		catch (LinkageError ex) {
+			// Can happen if Hibernate 4.2 is used, and JBoss EAP 6 wrapped NoClassDefFoundError in LinkageError
+			if (!isUsingJndi()) {
+				throw new IllegalStateException("Unable to set Hibernate JTA "
+						+ "platform, are you using the correct "
+						+ "version of Hibernate?", ex);
+			}
+			// Assume that Hibernate will use JNDI
+			if (logger.isDebugEnabled()) {
+				logger.debug("Unable to set Hibernate JTA platform : " + ex.getMessage());
+			}
+		}
 	}
 
 	private boolean isUsingJndi() {
